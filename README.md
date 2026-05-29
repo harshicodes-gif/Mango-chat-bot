@@ -1,29 +1,42 @@
 # Mango AI Chatbot 🥭
 
-A simple AI chatbot.
+A chatbot application built by Harshita using Streamlit with support for conversational responses and live information retrieval.
+
+## About The Project
+
+Mango AI is a chatbot designed to answer questions, maintain conversation history, and retrieve recent information from the web when needed.
+
+This project was built to explore:
+
+* Conversational AI applications
+* Real-time information retrieval
+* Streamlit deployment workflows
+* API integration and chatbot design
+
+---
 
 ## Features
 
-- Conversational AI chatbot
-- Chat history support
-- Powered by Groq LLMs
-- Deployable on Streamlit Cloud
-- Dark themed interface
+* Interactive chat interface
+* Conversation history support
+* Real-time information retrieval
+* Simple and clean UI
+* Deployable on Streamlit Cloud
 
 ---
 
 ## Requirements
 
-- Python 3.11 recommended
-- Groq API Key
-- GitHub account
-- Streamlit Cloud account
+* Python 3.11 recommended
+* API keys for configured services
+* GitHub account
+* Streamlit Cloud account
 
 ---
 
 ## Installation
 
-Clone repository:
+Clone the repository:
 
 ```bash
 git clone YOUR_GITHUB_REPO_LINK
@@ -58,9 +71,9 @@ project/
 
 ---
 
-## Streamlit Deployment
+## Deployment
 
-Push changes:
+1. Push code to GitHub
 
 ```bash
 git add .
@@ -68,18 +81,30 @@ git commit -m "deploy mango ai"
 git push
 ```
 
-Add secrets:
+2. Deploy using Streamlit Cloud
+
+3. Add required secrets
 
 ```toml
-GROQ_API_KEY="YOUR_GROQ_KEY"
+GROQ_API_KEY="YOUR_KEY"
+TAVILY_API_KEY="YOUR_KEY"
 ```
 
-Reboot Streamlit app.
+4. Reboot the application
 
 ---
 
-## Tech Stack
+## Future Improvements
 
-- Streamlit
-- Groq API
-- Python 3.11
+* File uploads
+* Voice interactions
+* Better memory handling
+* Improved UI customization
+* Expanded search capabilities
+
+---
+
+## Author
+
+Built by **Harshita**
+
