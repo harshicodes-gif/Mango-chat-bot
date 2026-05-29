@@ -5,26 +5,25 @@ A simple AI chatbot.
 ## Features
 
 - Conversational AI chatbot
-- Built using Streamlit
-- Powered by Gemini API
-- Dark themed interface
-- Maintains chat history
+- Chat history support
+- Powered by Groq LLMs
 - Deployable on Streamlit Cloud
+- Dark themed interface
 
 ---
 
 ## Requirements
 
 - Python 3.11 recommended
-- Gemini API Key
-- GitHub account (for deployment)
+- Groq API Key
+- GitHub account
 - Streamlit Cloud account
 
 ---
 
 ## Installation
 
-Clone the repository:
+Clone repository:
 
 ```bash
 git clone YOUR_GITHUB_REPO_LINK
@@ -61,7 +60,7 @@ project/
 
 ## Streamlit Deployment
 
-1. Push your code to GitHub
+Push changes:
 
 ```bash
 git add .
@@ -69,69 +68,18 @@ git commit -m "deploy mango ai"
 git push
 ```
 
-2. Open Streamlit Cloud
-
-3. Create a new app
-
-4. Select your GitHub repository
-
-5. Add Secrets:
+Add secrets:
 
 ```toml
-GEMINI_API_KEY="YOUR_GEMINI_KEY"
+GROQ_API_KEY="YOUR_GROQ_KEY"
 ```
 
-6. Save secrets
-
-7. Reboot app
-
----
-
-## requirements.txt
-
-```txt
-streamlit>=1.35.0
-google-generativeai>=0.8.0
-```
-
----
-
-## Troubleshooting
-
-### API Key Error
-
-Check:
-
-```toml
-GEMINI_API_KEY="YOUR_KEY"
-```
-
-### Model Errors
-
-Make sure app.py uses:
-
-```python
-model = genai.GenerativeModel(
-    "gemini-2.0-flash"
-)
-```
-
-### Deployment Issues
-
-- Reboot Streamlit app
-- Verify Python version is 3.11
-- Verify secrets are configured
+Reboot Streamlit app.
 
 ---
 
 ## Tech Stack
 
 - Streamlit
-- Google Gemini API
+- Groq API
 - Python 3.11
-
----
-
-## Author
-
-Built with ❤️ by Harshita
