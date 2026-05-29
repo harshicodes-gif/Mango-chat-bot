@@ -6,17 +6,15 @@ A simple AI chatbot.
 
 ```bash
 streamlit run app.py
+```
 
----
+## Upload to GitHub
 
-# 5. Upload to GitHub
-
-Push the folder:
-
-```bash id="yxmtmk"
+```bash
 git init
 git add .
 git commit -m "Initial commit"
 git branch -M main
 git remote add origin YOUR_GITHUB_REPO_LINK
 git push -u origin main
+```
