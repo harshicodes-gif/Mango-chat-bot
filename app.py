@@ -1,42 +1,62 @@
 import streamlit as st
 from openai import OpenAI
 
+# -----------------------------
 # Page configuration
+# -----------------------------
 st.set_page_config(
     page_title="Mango AI",
     page_icon="🥭",
     layout="centered"
 )
 
-# Custom styling
+# -----------------------------
+# Styling
+# -----------------------------
 st.markdown("""
-    <style>
-    .stChatMessage {
-        border-radius: 15px;
-        padding: 10px;
-    }
+<style>
+.stChatMessage {
+    border-radius: 15px;
+    padding: 10px;
+}
 
-    .main {
-        background-color: #0f1117;
-    }
+.main {
+    background-color: #0f1117;
+}
 
-    h1 {
-        text-align: center;
-    }
-    </style>
+h1 {
+    text-align: center;
+}
+</style>
 """, unsafe_allow_html=True)
 
-# Title
+# -----------------------------
+# Header
+# -----------------------------
 st.title("🥭 Mango AI")
 st.caption("Clear and concise AI conversations.")
 
-# OpenAI client
-client = OpenAI(
-    api_key=st.secrets["OPENAI_API_KEY"]
-)
+# -----------------------------
+# OpenAI setup
+# -----------------------------
+try:
+    api_key = st.secrets["OPENAI_API_KEY"]
 
-# Chat history
+    client = OpenAI(
+        api_key=api_key
+    )
+
+except Exception:
+    st.error(
+        "Missing OpenAI API key. Add OPENAI_API_KEY in Streamlit Secrets."
+    )
+    st.stop()
+
+# -----------------------------
+# Chat History
+# -----------------------------
 if "messages" not in st.session_state:
+
     st.session_state.messages = [
         {
             "role": "assistant",
@@ -44,17 +64,22 @@ if "messages" not in st.session_state:
         }
     ]
 
-# Display previous messages
+# Display history
 for message in st.session_state.messages:
+
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
-# Chat input
-prompt = st.chat_input("Type your message...")
+# -----------------------------
+# Input
+# -----------------------------
+prompt = st.chat_input(
+    "Type your message..."
+)
 
 if prompt:
 
-    # Save user message
+    # Store user message
     st.session_state.messages.append(
         {
             "role": "user",
@@ -62,25 +87,36 @@ if prompt:
         }
     )
 
-    # Display user message
+    # Show user message
     with st.chat_message("user"):
         st.markdown(prompt)
 
-    # Generate response
+    # Generate assistant response
     with st.chat_message("assistant"):
 
         with st.spinner("Thinking..."):
 
-            response = client.chat.completions.create(
-                model="gpt-4.1-mini",
-                messages=st.session_state.messages
-            )
+            try:
 
-            reply = response.choices[0].message.content
+                response = client.chat.completions.create(
+                    model="gpt-4.1-mini",
+                    messages=st.session_state.messages
+                )
+
+                reply = response.choices[0].message.content
+
+            except Exception as e:
+
+                reply = (
+                    "Sorry — something went wrong while "
+                    "talking to OpenAI."
+                )
+
+                st.error(str(e))
 
             st.markdown(reply)
 
-    # Save assistant response
+    # Save response
     st.session_state.messages.append(
         {
             "role": "assistant",
