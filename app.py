@@ -1,5 +1,5 @@
 import streamlit as st
-from openai import OpenAI
+import google.generativeai as genai
 
 # -----------------------------
 # Page configuration
@@ -37,23 +37,27 @@ st.title("🥭 Mango AI")
 st.caption("Clear and concise AI conversations.")
 
 # -----------------------------
-# OpenAI setup
+# Gemini setup
 # -----------------------------
 try:
-    api_key = st.secrets["OPENAI_API_KEY"]
+    api_key = st.secrets["GEMINI_API_KEY"]
 
-    client = OpenAI(
+    genai.configure(
         api_key=api_key
+    )
+
+    model = genai.GenerativeModel(
+        "gemini-1.5-flash"
     )
 
 except Exception:
     st.error(
-        "Missing OpenAI API key. Add OPENAI_API_KEY in Streamlit Secrets."
+        "Missing GEMINI_API_KEY in Streamlit Secrets."
     )
     st.stop()
 
 # -----------------------------
-# Chat History
+# Chat history
 # -----------------------------
 if "messages" not in st.session_state:
 
@@ -64,14 +68,14 @@ if "messages" not in st.session_state:
         }
     ]
 
-# Display history
+# Display messages
 for message in st.session_state.messages:
 
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
 # -----------------------------
-# Input
+# User input
 # -----------------------------
 prompt = st.chat_input(
     "Type your message..."
@@ -79,7 +83,6 @@ prompt = st.chat_input(
 
 if prompt:
 
-    # Store user message
     st.session_state.messages.append(
         {
             "role": "user",
@@ -87,36 +90,31 @@ if prompt:
         }
     )
 
-    # Show user message
     with st.chat_message("user"):
         st.markdown(prompt)
 
-    # Generate assistant response
     with st.chat_message("assistant"):
 
         with st.spinner("Thinking..."):
 
             try:
 
-                response = client.chat.completions.create(
-                    model="gpt-4.1-mini",
-                    messages=st.session_state.messages
+                response = model.generate_content(
+                    prompt
                 )
 
-                reply = response.choices[0].message.content
+                reply = response.text
 
             except Exception as e:
 
                 reply = (
-                    "Sorry — something went wrong while "
-                    "talking to OpenAI."
+                    "Sorry — something went wrong."
                 )
 
                 st.error(str(e))
 
             st.markdown(reply)
 
-    # Save response
     st.session_state.messages.append(
         {
             "role": "assistant",
