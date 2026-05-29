@@ -1,83 +1,45 @@
 import streamlit as st
 from groq import Groq
+from tavily import TavilyClient
 
-# -----------------------------
-# Page configuration
-# -----------------------------
 st.set_page_config(
     page_title="Mango AI",
     page_icon="🥭",
     layout="centered"
 )
 
-# -----------------------------
-# Styling
-# -----------------------------
-st.markdown("""
-<style>
-.stChatMessage {
-    border-radius: 15px;
-    padding: 10px;
-}
-
-.main {
-    background-color: #0f1117;
-}
-
-h1 {
-    text-align: center;
-}
-</style>
-""", unsafe_allow_html=True)
-
-# -----------------------------
-# Header
-# -----------------------------
 st.title("🥭 Mango AI")
-st.caption("Clear and concise AI conversations.")
+st.caption("AI with live web access")
 
-# -----------------------------
-# Groq Setup
-# -----------------------------
 try:
     client = Groq(
         api_key=st.secrets["GROQ_API_KEY"]
     )
 
-except Exception as e:
-    st.error(
-        f"Setup Error: {str(e)}"
+    tavily = TavilyClient(
+        api_key=st.secrets["TAVILY_API_KEY"]
     )
+
+except Exception as e:
+    st.error(str(e))
     st.stop()
 
-# -----------------------------
-# Chat History
-# -----------------------------
 if "messages" not in st.session_state:
-
     st.session_state.messages = [
         {
             "role": "assistant",
-            "content": "Hey! I'm Mango AI. How can I help you today?"
+            "content": "Hey! I'm Mango AI. Ask me anything."
         }
     ]
 
-# Display previous messages
-for message in st.session_state.messages:
+for msg in st.session_state.messages:
+    with st.chat_message(msg["role"]):
+        st.markdown(msg["content"])
 
-    with st.chat_message(message["role"]):
-        st.markdown(message["content"])
-
-# -----------------------------
-# User Input
-# -----------------------------
-prompt = st.chat_input(
-    "Type your message..."
-)
+prompt = st.chat_input("Type your message...")
 
 if prompt:
 
-    # Save user message
     st.session_state.messages.append(
         {
             "role": "user",
@@ -85,22 +47,52 @@ if prompt:
         }
     )
 
-    # Display user message
     with st.chat_message("user"):
         st.markdown(prompt)
 
-    # Generate response
     with st.chat_message("assistant"):
 
         with st.spinner("Thinking..."):
 
             try:
 
+                search_results = tavily.search(
+                    query=prompt,
+                    search_depth="basic",
+                    max_results=5
+                )
+
+                context = ""
+
+                for result in search_results["results"]:
+
+                    context += (
+                        f"Title: {result['title']}\n"
+                        f"Content: {result['content']}\n\n"
+                    )
+
+                messages = [
+                    {
+                        "role": "system",
+                        "content":
+                        "Use web results when relevant."
+                    },
+                    {
+                        "role": "user",
+                        "content":
+                        f"""
+Question:
+{prompt}
+
+Web Results:
+{context}
+"""
+                    }
+                ]
+
                 response = client.chat.completions.create(
                     model="llama-3.3-70b-versatile",
-                    messages=st.session_state.messages,
-                    temperature=0.7,
-                    max_tokens=1024
+                    messages=messages
                 )
 
                 reply = (
@@ -120,11 +112,9 @@ if prompt:
 
             st.markdown(reply)
 
-    # Save assistant message
     st.session_state.messages.append(
         {
             "role": "assistant",
             "content": reply
         }
     )
-
