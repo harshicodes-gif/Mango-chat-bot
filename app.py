@@ -1,5 +1,5 @@
 import streamlit as st
-import google.generativeai as genai
+from groq import Groq
 
 # -----------------------------
 # Page configuration
@@ -37,17 +37,11 @@ st.title("🥭 Mango AI")
 st.caption("Clear and concise AI conversations.")
 
 # -----------------------------
-# Gemini setup
+# Groq Setup
 # -----------------------------
 try:
-    api_key = st.secrets["GEMINI_API_KEY"]
-
-    genai.configure(
-        api_key=api_key
-    )
-
-    model = genai.GenerativeModel(
-        "gemini-2.0-flash"
+    client = Groq(
+        api_key=st.secrets["GROQ_API_KEY"]
     )
 
 except Exception as e:
@@ -57,7 +51,7 @@ except Exception as e:
     st.stop()
 
 # -----------------------------
-# Chat history
+# Chat History
 # -----------------------------
 if "messages" not in st.session_state:
 
@@ -75,7 +69,7 @@ for message in st.session_state.messages:
         st.markdown(message["content"])
 
 # -----------------------------
-# User input
+# User Input
 # -----------------------------
 prompt = st.chat_input(
     "Type your message..."
@@ -91,7 +85,7 @@ if prompt:
         }
     )
 
-    # Show user message
+    # Display user message
     with st.chat_message("user"):
         st.markdown(prompt)
 
@@ -102,25 +96,19 @@ if prompt:
 
             try:
 
-                # Build conversation context
-                conversation = ""
-
-                for msg in st.session_state.messages:
-
-                    role = msg["role"]
-
-                    if role == "assistant":
-                        role = "AI"
-
-                    conversation += (
-                        f"{role}: {msg['content']}\n"
-                    )
-
-                response = model.generate_content(
-                    conversation
+                response = client.chat.completions.create(
+                    model="llama-3.3-70b-versatile",
+                    messages=st.session_state.messages,
+                    temperature=0.7,
+                    max_tokens=1024
                 )
 
-                reply = response.text
+                reply = (
+                    response
+                    .choices[0]
+                    .message
+                    .content
+                )
 
             except Exception as e:
 
