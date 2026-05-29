@@ -47,12 +47,12 @@ try:
     )
 
     model = genai.GenerativeModel(
-        "gemini-1.5-flash"
+        "gemini-2.0-flash"
     )
 
-except Exception:
+except Exception as e:
     st.error(
-        "Missing GEMINI_API_KEY in Streamlit Secrets."
+        f"Setup Error: {str(e)}"
     )
     st.stop()
 
@@ -68,7 +68,7 @@ if "messages" not in st.session_state:
         }
     ]
 
-# Display messages
+# Display previous messages
 for message in st.session_state.messages:
 
     with st.chat_message(message["role"]):
@@ -83,6 +83,7 @@ prompt = st.chat_input(
 
 if prompt:
 
+    # Save user message
     st.session_state.messages.append(
         {
             "role": "user",
@@ -90,17 +91,33 @@ if prompt:
         }
     )
 
+    # Show user message
     with st.chat_message("user"):
         st.markdown(prompt)
 
+    # Generate response
     with st.chat_message("assistant"):
 
         with st.spinner("Thinking..."):
 
             try:
 
+                # Build conversation context
+                conversation = ""
+
+                for msg in st.session_state.messages:
+
+                    role = msg["role"]
+
+                    if role == "assistant":
+                        role = "AI"
+
+                    conversation += (
+                        f"{role}: {msg['content']}\n"
+                    )
+
                 response = model.generate_content(
-                    prompt
+                    conversation
                 )
 
                 reply = response.text
@@ -115,9 +132,11 @@ if prompt:
 
             st.markdown(reply)
 
+    # Save assistant message
     st.session_state.messages.append(
         {
             "role": "assistant",
             "content": reply
         }
     )
+
